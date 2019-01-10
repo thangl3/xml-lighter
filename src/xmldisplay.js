@@ -10,11 +10,8 @@
             // If in block of parent has content like `xml` or other... clear all them
             xmlFormater.empty(xmlHolderElement);
 
-            const container = document.createElement('div');
-            container.className = 'xml-formatter';
-
             let render = xmlFormater.init(options);
-            render(container, xmlDom.documentElement, 0);
+            const container = render(xmlDom.documentElement);
 
             xmlHolderElement.appendChild(container);
         }
@@ -38,6 +35,8 @@
         global.loadXMLDOM = loadXMLDOM;
         global.loadXMLString = loadXMLString;
     }
+
+
 }(window, function () {
     'use strict';
 
@@ -49,17 +48,23 @@
         switchLessAction    : 'hide',
 
         // css class name
+        classContainer          : 'xml-display',
         classInline             : 'inline-flex',
         classNodeName           : 'node-name',
         classNodeValue          : 'node-value',
         classSwitcher           : 'switcher',
         classBracket            : 'bracket',
+        classBracketOpen        : 'bracket-open',
+        classBracketClose       : 'bracket-close',
+        classBracketShortClose  : 'bracket-short-close',
+        classEquals             : 'equals',
         classAttributeName      : 'node-attribute-name',
         classAttributeValue     : 'node-attribute-value',
         classDivContainer       : 'node',
         classAddLineCode        : 'line-code',
+        classNodeParent         : 'node-parent',
         classSwitcherCollapsed  : 'collapsed',
-        classBackgroundCollapse : 'background-collapsed'
+        classNodeCollapsed      : 'node-collapsed'
     };
 
     const xmlFormater = {
@@ -87,7 +92,7 @@
             let idRender = 1;
             let startWithIndentSpace = 0;
 
-            function createContainer(tagName, cssClass, position, isIndent) {
+            function createElement(tagName, cssClass, position, isIndent) {
                 tagName = tagName || settings.containerTag;
 
                 const containerElement = document.createElement(tagName);
@@ -143,7 +148,7 @@
                         attribute  = attributes.item(i);
 
                         element.appendChild(createTextNode(' ' + _this.stringify(attribute.nodeName),   constants.classAttributeName));
-                        element.appendChild(createTextNode('=',                                         constants.classBracket));
+                        element.appendChild(createTextNode('=',                                         constants.classEquals));
                         element.appendChild(createTextNode('"' + attribute.nodeValue + '"',             constants.classAttributeValue));
                     }
                 }
@@ -184,8 +189,8 @@
                 return switcherElement;
             }
 
-            function render(xmlHolderElement, xmlRootNode, indentSpace) {
-                if (!xmlRootNode || !xmlHolderElement) {
+            function generator(container, xmlRootNode, indentSpace) {
+                if (!xmlRootNode || !container) {
                     return false;
                 }
 
@@ -195,53 +200,58 @@
 
                 // When in the tag no has any data like that <tag></tag> output will be <tag/>
                 if (xmlRootNode.childNodes.length === 0 && settings.useShortTag) {
-                    const containerLessElement = createContainer();
+                    const containerLessElement = createElement();
 
                     // Create a short tag node like that:
                     // <Hello />
                     // Hello attribute="123abc" />
-                    containerLessElement.appendChild(createTextNode('<', constants.classBracket));
+                    containerLessElement.appendChild(createTextNode('<', [ constants.classBracket, constants.classBracketOpen ]));
                     containerLessElement.appendChild(createTextNode(_this.stringify(xmlRootNode.nodeName), constants.classNodeName));
                     generatorAttributesNode(containerLessElement, xmlRootNode.attributes);
-                    containerLessElement.appendChild(createTextNode(' />'));
+                    containerLessElement.appendChild(createTextNode(' />', [ constants.classBracket, constants.classBracketShortClose ]));
 
-                    xmlHolderElement.appendChild(containerLessElement);
+                    container.appendChild(containerLessElement);
                 } else {
-                    ///// create shadow of node element
-                    const containerLessElement = createContainer(null, [ constants.classDivContainer ]);
+                    // Do not create shadow and button switcher when the nodes have children and they less than 1
+                    //
+                    // can not create shadow of a node when view more or less has using inline syntax
+                    // can not create button switcher of a node when view more or less has using short tag
+                    const canCreateShadowSwitcher = (xmlRootNode.childNodes.length > 1 || (!settings.inline && xmlRootNode.childNodes.length > 0));
 
-                    // Disable view more or less for node has using inline syntax and have children are less than or equals 1
-                    if (xmlRootNode.childNodes.length > 1 || !settings.inline) {
+                    ///// create shadow of node element
+                    // shadow display when user toggle (visible less `xml`) of a node
+                    if (canCreateShadowSwitcher) {
+                        const containerLessElement = createElement(null, [ constants.classDivContainer, constants.classNodeCollapsed ]);
+
                         // This will display when user click display `less`
                         containerLessElement.appendChild(createSwitcherNode(true, idRender));
 
-                        addClass(containerLessElement, constants.classBackgroundCollapse);
+                        // create a node like that:
+                        // <Hello attribute="123"></Hello>
+                        // <Hello></Hello>
+                        containerLessElement.appendChild(createTextNode('<', [ constants.classBracket, constants.classBracketOpen ]));
+                        containerLessElement.appendChild(createTextNode(_this.stringify(xmlRootNode.nodeName), constants.classNodeName));
+                        generatorAttributesNode(containerLessElement, xmlRootNode.attributes);
+                        containerLessElement.appendChild(createTextNode('></', [ constants.classBracket, constants.classBracketClose ]));
+                        containerLessElement.appendChild(createTextNode(_this.stringify(xmlRootNode.nodeName), constants.classNodeName));
+                        containerLessElement.appendChild(createTextNode('>', constants.classBracket));
+
+                        container.appendChild(containerLessElement);
+
+                        _this.setVisibility(containerLessElement, false);
                     }
-
-                    // create a node like that:
-                    // <Hello attribute="123">world</Hello>
-                    // <Hello>world</Hello>
-                    // <Hello></Hello>
-                    containerLessElement.appendChild(createTextNode('<', constants.classBracket));
-                    containerLessElement.appendChild(createTextNode(_this.stringify(xmlRootNode.nodeName), constants.classNodeName));
-                    generatorAttributesNode(containerLessElement, xmlRootNode.attributes);
-                    containerLessElement.appendChild(createTextNode('></', constants.classBracket));
-                    containerLessElement.appendChild(createTextNode(_this.stringify(xmlRootNode.nodeName), constants.classNodeName));
-                    containerLessElement.appendChild(createTextNode('>', constants.classBracket));
-
-                    xmlHolderElement.appendChild(containerLessElement);
-
-                    _this.setVisibility(containerLessElement, false);
                     ///// End generate shadow
 
-                    const containerMoreElement = createContainer();
+                    ///// create all element of xml
+                    const containerMoreElement = createElement();
 
-                    // Disable view more or less for node has using short tag and have children are less than or equals 1
-                    if (xmlRootNode.childNodes.length > 1 || !settings.inline) {
+                    if (canCreateShadowSwitcher) {
                         // This will display when user click display `more`
                         containerMoreElement.appendChild(createSwitcherNode(false, idRender));
 
-                        addClass(containerMoreElement, constants.classAddLineCode);
+                        // add line code
+                        containerMoreElement.appendChild(createElement('span', constants.classAddLineCode, 'absolute', false));
+                        addClass(containerMoreElement, constants.classNodeParent);
                     }
 
                     idRender++;
@@ -249,7 +259,7 @@
                     // create a node like that:
                     // <Hello attribute="123">
                     // <Hello>
-                    containerMoreElement.appendChild(createTextNode('<', constants.classBracket));
+                    containerMoreElement.appendChild(createTextNode('<', [ constants.classBracket, constants.classBracketOpen ]));
                     containerMoreElement.appendChild(createTextNode(_this.stringify(xmlRootNode.nodeName), constants.classNodeName));
                     generatorAttributesNode(containerMoreElement, xmlRootNode.attributes);
                     containerMoreElement.appendChild(createTextNode('>', constants.classBracket));
@@ -258,6 +268,7 @@
                     let i, n, childNode, childNodeValue;
                     let runable = true;
 
+                    // Loop all item and continue run again if they have children in their node
                     for (i = 0; i < (n = xmlRootNode.childNodes.length); i++) {
                         childNode = xmlRootNode.childNodes.item(i);
 
@@ -268,7 +279,7 @@
                         }
 
                         if (runable) {
-                            render(containerMoreElement, childNode, settings.indentSpace);
+                            generator(containerMoreElement, childNode, settings.indentSpace);
                         } else {
                             childNodeValue = childNode.nodeValue;
                         }                 
@@ -280,7 +291,7 @@
                         const className = _this.defaultSettings.inline ? constants.classInline : false;
                         const position = _this.defaultSettings.inline ? false : null;
 
-                        const childNodeContainer = createContainer(null, className, position);
+                        const childNodeContainer = createElement(null, className, position);
       
                         childNodeContainer.appendChild(createTextNode(childNodeValue, constants.classNodeValue));
 
@@ -290,12 +301,25 @@
 
                     // Create close tag node like that:
                     // </Hello>
-                    containerMoreElement.appendChild(createTextNode('</', constants.classBracket));
+                    containerMoreElement.appendChild(createTextNode('</', [ constants.classBracket, constants.classBracketClose ]));
                     containerMoreElement.appendChild(createTextNode(_this.stringify(xmlRootNode.nodeName), constants.classNodeName));
                     containerMoreElement.appendChild(createTextNode('>', constants.classBracket));
 
-                    xmlHolderElement.appendChild(containerMoreElement);
+                    container.appendChild(containerMoreElement);
+                    ///// End create
                 }
+
+                return container;
+            }
+
+            // Pure function render xml to browser
+            function render(xmlRootNode) {
+                const containerElement = createElement('div', false, false, false);
+                containerElement.className = constants.classContainer;
+
+                generator(containerElement, xmlRootNode, 0);
+
+                return containerElement;
             }
 
             return render;
@@ -320,6 +344,14 @@
             }
             
             return xmlDom;
+        },
+
+        addEventListener: function (element, listener, callback) {
+            element.addEventListener(listener, callback);
+        },
+
+        removeEventListener: function (element, listener) {
+            element.removeEventListener(element);
         },
 
         // trim space when api return xml

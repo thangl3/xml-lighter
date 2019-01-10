@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Testing display xml</title>
-    <link rel="stylesheet" type="text/css" href="../themes/xcode.css">
-</head>
-<body>
-    <textarea id="code" style="display: none">
-        <?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <OW ISA="16042502016" SENTDATE="20160112" SENTTIME="1552" RXQ="ZZ" RX="16072913493sda0717" TXQ="ZZ" TX="1607291123349124350717" MODE="103231">
   <ORDER EDI753="N" SEQ="00001" IMPORTS="Y" PRIORITY="N" RLABEL="N" TYPE="DTCS" SOURCE="100104">
     <HEADER>
@@ -16,7 +8,7 @@
         <SONUMBER>1521</SONUMBER>
       </BASICINFO>
       <BT>
-        <N1 ACCOUNT="1001">Thang Le</N1>
+        <N1 ACCOUNT="1001">Duong Bui</N1>
         <N3>
           <ADDR1>542 Pacific Ave</ADDR1>
           <ADDR2></ADDR2>
@@ -26,21 +18,21 @@
           <STATE_PROVINCE>CA</STATE_PROVINCE>
           <ZIP>94501</ZIP>
           <POS />
-          <COUNTRY>VN</COUNTRY>
+          <COUNTRY>US</COUNTRY>
         </N4>
       </BT>
       <ST>
-        <N1 ACCOUNT="1001">Thang Le</N1>
+        <N1 ACCOUNT="1001">Duong Bui</N1>
         <N3>
           <ADDR1>542 Pacific Ave</ADDR1>
           <ADDR2></ADDR2>
         </N3>
         <N4>
-          <CITY>Da Nang</CITY>
-          <STATE_PROVINCE>DN</STATE_PROVINCE>
+          <CITY>Alameda</CITY>
+          <STATE_PROVINCE>CA</STATE_PROVINCE>
           <ZIP>94501</ZIP>
           <POS />
-          <COUNTRY>VN</COUNTRY>
+          <COUNTRY>US</COUNTRY>
         </N4>
       </ST>
       <N9HDR QUAL="90">26.23</N9HDR>
@@ -73,20 +65,3 @@
   </ORDER>
   <OWTOTAL TORDERS="1" />
 </OW>
-    </textarea>
-    <div id="xml"></div>
-</body>
-<script type="text/javascript" src="../src/xmldisplay.js"></script>
-<script>
-    loadXMLString('xml', document.getElementById("code").value, {
-        inline: true,
-
-        // this is default setting
-        useShortTag: false,
-        indentSpace: 4,
-        removeComment: true,
-        nodeLowerCase: false,
-        nodeUpperCase: false
-    });
-</script>
-</html>
