@@ -49,6 +49,7 @@
 
         // css class name
         classContainer          : 'xml-display',
+        classNodeContainer      : 'xml',
         classInline             : 'inline-flex',
         classNodeName           : 'node-name',
         classNodeValue          : 'node-value',
@@ -60,11 +61,16 @@
         classEquals             : 'equals',
         classAttributeName      : 'node-attribute-name',
         classAttributeValue     : 'node-attribute-value',
+
         classDivContainer       : 'node',
-        classAddLineCode        : 'line-code',
         classNodeParent         : 'node-parent',
+        classNodeCollapsed      : 'node-collapsed',
+        classNodeUncollapse     : 'node-uncollapse',
+
         classSwitcherCollapsed  : 'collapsed',
-        classNodeCollapsed      : 'node-collapsed'
+        classAddLineCode        : 'line-code',
+        classOneLineCode        : 'one-line-code',
+        //classLineNumber         : 'line-number'
     };
 
     const xmlFormater = {
@@ -72,12 +78,13 @@
             containerTag: 'div',
             containerPosition: 'relative', // css position attributes liek that: "relative", "static", "fixed" or "absolute"
             indentSpace: 4,
-            pxOfOnceSpace: 7, // each once space (tab) equals 7px
+            pxOfOnceSpace: 6, // each once space (tab) equals 7px
             removeComment: true,
             nodeLowerCase: false,
             nodeUpperCase: false,
             inline: true,
-            useShortTag: true
+            useShortTag: true,
+            //lineNumber: false
         },
 
         init: function (userSettings) {
@@ -109,12 +116,12 @@
                     }
                 }
                 
-                if (position !== false) {
+                if (position != false) {
                     containerElement.style.position = position || settings.containerPosition;
                 }
 
                 if (isIndent !== false) {
-                    containerElement.style.left = computedNestingIndent(startWithIndentSpace);
+                    containerElement.style.marginLeft = computedNestingIndent(startWithIndentSpace);
                 }
 
                 return containerElement;
@@ -202,13 +209,23 @@
                 if (xmlRootNode.childNodes.length === 0 && settings.useShortTag) {
                     const containerLessElement = createElement();
 
+                    containerLessElement.appendChild(createElement('span', constants.classOneLineCode, null, false));
+
                     // Create a short tag node like that:
                     // <Hello />
                     // Hello attribute="123abc" />
-                    containerLessElement.appendChild(createTextNode('<', [ constants.classBracket, constants.classBracketOpen ]));
+                    containerLessElement.appendChild(createTextNode(
+                        '<',
+                        [
+                            constants.classBracket,
+                            constants.classBracketOpen
+                        ]
+                    ));
                     containerLessElement.appendChild(createTextNode(_this.stringify(xmlRootNode.nodeName), constants.classNodeName));
                     generatorAttributesNode(containerLessElement, xmlRootNode.attributes);
                     containerLessElement.appendChild(createTextNode(' />', [ constants.classBracket, constants.classBracketShortClose ]));
+
+                    addClass(containerLessElement, constants.classNodeUncollapse);
 
                     container.appendChild(containerLessElement);
                 } else {
@@ -229,7 +246,9 @@
                         // create a node like that:
                         // <Hello attribute="123"></Hello>
                         // <Hello></Hello>
-                        containerLessElement.appendChild(createTextNode('<', [ constants.classBracket, constants.classBracketOpen ]));
+                        containerLessElement.appendChild(
+                            createTextNode('<', [ constants.classBracket, constants.classBracketOpen ])
+                        );
                         containerLessElement.appendChild(createTextNode(_this.stringify(xmlRootNode.nodeName), constants.classNodeName));
                         generatorAttributesNode(containerLessElement, xmlRootNode.attributes);
                         containerLessElement.appendChild(createTextNode('></', [ constants.classBracket, constants.classBracketClose ]));
@@ -245,6 +264,8 @@
                     ///// create all element of xml
                     const containerMoreElement = createElement();
 
+                    addClass(containerMoreElement, constants.classNodeUncollapse);
+
                     if (canCreateShadowSwitcher) {
                         // This will display when user click display `more`
                         containerMoreElement.appendChild(createSwitcherNode(false, idRender));
@@ -259,6 +280,8 @@
                     // create a node like that:
                     // <Hello attribute="123">
                     // <Hello>
+                    containerMoreElement.appendChild(createElement('span', constants.classOneLineCode, false, false));
+
                     containerMoreElement.appendChild(createTextNode('<', [ constants.classBracket, constants.classBracketOpen ]));
                     containerMoreElement.appendChild(createTextNode(_this.stringify(xmlRootNode.nodeName), constants.classNodeName));
                     generatorAttributesNode(containerMoreElement, xmlRootNode.attributes);
@@ -290,18 +313,23 @@
                         // check user want to a node is dispay on the line
                         const className = _this.defaultSettings.inline ? constants.classInline : false;
                         const position = _this.defaultSettings.inline ? false : null;
+                        const isIndent = _this.defaultSettings.inline ? false : null;
 
-                        const childNodeContainer = createElement(null, className, position);
+                        const childNodeContainer = createElement(null, className, position, isIndent);
       
                         childNodeContainer.appendChild(createTextNode(childNodeValue, constants.classNodeValue));
 
                         containerMoreElement.appendChild(childNodeContainer);
+
+                        containerMoreElement.appendChild(createElement('span', constants.classOneLineCode, false, false));
                     }
                     ///// End loop create nesting tag node
 
                     // Create close tag node like that:
                     // </Hello>
-                    containerMoreElement.appendChild(createTextNode('</', [ constants.classBracket, constants.classBracketClose ]));
+                    containerMoreElement.appendChild(
+                        createTextNode('</', [ constants.classBracket, constants.classBracketClose ])
+                    );
                     containerMoreElement.appendChild(createTextNode(_this.stringify(xmlRootNode.nodeName), constants.classNodeName));
                     containerMoreElement.appendChild(createTextNode('>', constants.classBracket));
 
@@ -314,12 +342,30 @@
 
             // Pure function render xml to browser
             function render(xmlRootNode) {
-                const containerElement = createElement('div', false, false, false);
-                containerElement.className = constants.classContainer;
+                let containerNodeElement = createElement('div', false, false, false);
+                containerNodeElement.className = constants.classContainer;
 
-                generator(containerElement, xmlRootNode, 0);
+                containerNodeElement = generator(containerNodeElement, xmlRootNode, 0);
 
-                return containerElement;
+                //if (!!(!settings.lineNumber)) {
+                    return containerNodeElement;
+                //}
+
+                // const containerElement = createElement('div',[constants.classContainer, constants.classInline], false, false);
+
+                // const totalLineCode = containerNodeElement.querySelectorAll('.' + constants.classOneLineCode).length || 0;
+                // const lineNumberContainer = createElement('div', constants.classLineNumber, false, false);
+
+                // for (let i = 1; i <= totalLineCode; i++) {
+                //     lineNumberContainer.appendChild(createElement('span', false, false, false));
+                // }
+
+                // containerElement.appendChild(lineNumberContainer);
+
+                // containerElement.appendChild(lineNumberContainer);
+                // containerElement.appendChild(containerNodeElement);
+
+                // return containerElement;
             }
 
             return render;

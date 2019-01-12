@@ -61,7 +61,7 @@
     background-color: #5d655b;
 }
 
-.xml-display .inline-flex {
+.inline-flex {
     display: inline-flex;
 }
 
@@ -73,17 +73,46 @@
     display: none;
 }
 
-/*.xml-display .line-code {
-    border-left-color: #90918B;
-    border-left-width: thin;
-    border-left-style: dotted;
-}*/
 .xml-display .node-parent::before {
     content: "";
     position: absolute;
-    height: 100%;
-    left: 7px;
+    margin: auto;
+    top: .7rem;
+    left: .6rem;
+    bottom: .7rem;
+    right: 0;
     border-left-color: #5f5b5f;
     border-left-width: thin;
     border-left-style: dotted;
 }
+
+/*.xml-display .line-number {
+    background-color: #282923;
+    width: 1.7rem;
+    padding: 0.15rem 0.5em 0.15rem 0;
+    box-shadow: .1.4em .1.4em .5em rgba(0,0,0,.45);
+    counter-reset: line;
+    margin-right: .3rem;
+}
+
+.xml-display {
+    counter-reset: line;
+}
+
+.xml-display .one-line-code {
+    position: fixed;
+    left: 0;
+    display: block;
+    line-height: 1.4rem;
+}
+
+.xml-display .node-uncollapse .one-line-code::before {
+    counter-increment: line;
+    content: counter(line);
+    display: inline-block;
+    border-right: 1px solid #ddd;
+    padding: 0 .5em;
+    width: 1.5rem;
+    text-align: right;
+    color: #888
+}*/
