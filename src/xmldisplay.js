@@ -132,7 +132,7 @@
             }
 
             function createTextNode(text, cssClass, tag) {
-                const childNode = document.createElement(tag || 'span');
+                const childNode = createElement(tag || 'span', false, false, false);
 
                 if (cssClass instanceof Array) {
                     let i, n;
@@ -200,6 +200,8 @@
                 if (!xmlRootNode || !container) {
                     return false;
                 }
+
+                //let container = createElement('div', constants.classNodeContainer, false, false);
 
                 if (indentSpace !== undefined) {
                     startWithIndentSpace = indentSpace;
@@ -345,7 +347,7 @@
                 let containerNodeElement = createElement('div', false, false, false);
                 containerNodeElement.className = constants.classContainer;
 
-                containerNodeElement = generator(containerNodeElement, xmlRootNode, 0);
+                generator(containerNodeElement, xmlRootNode, 0);
 
                 //if (!!(!settings.lineNumber)) {
                     return containerNodeElement;
