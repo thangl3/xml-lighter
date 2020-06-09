@@ -2,91 +2,81 @@
 <html>
 <head>
     <title>Testing display xml</title>
-    <link rel="stylesheet" type="text/css" href="../themes/default.css">
+    <!-- inject:css -->
+		<!-- endinject -->
 </head>
 <body>
     <textarea id="code" style="display: none">
-        <?xml version="1.0" encoding="utf-8"?>
-<OW ISA="16042502016" SENTDATE="20160112" SENTTIME="1552" RXQ="ZZ" RX="16072913493sda0717" TXQ="ZZ" TX="1607291123349124350717" MODE="103231">
-  <ORDER EDI753="N" SEQ="00001" IMPORTS="Y" PRIORITY="N" RLABEL="N" TYPE="DTCS" SOURCE="100104">
-    <HEADER>
-      <BASICINFO>
-        <FREIGHT_TERMS CODE="CC" />
-        <PO TYPE="" DATE="20160112" />
-        <SONUMBER>1521</SONUMBER>
-      </BASICINFO>
-      <BT>
-        <N1 ACCOUNT="1001">Thang Le</N1>
-        <N3>
-          <ADDR1>542 Pacific Ave</ADDR1>
-          <ADDR2></ADDR2>
-        </N3>
-        <N4>
-          <CITY>Alameda</CITY>
-          <STATE_PROVINCE>CA</STATE_PROVINCE>
-          <ZIP>94501</ZIP>
-          <POS />
-          <COUNTRY>VN</COUNTRY>
-        </N4>
-      </BT>
-      <ST>
-        <N1 ACCOUNT="1001">Thang Le</N1>
-        <N3>
-          <ADDR1>542 Pacific Ave</ADDR1>
-          <ADDR2></ADDR2>
-        </N3>
-        <N4>
-          <CITY>Da Nang</CITY>
-          <STATE_PROVINCE>DN</STATE_PROVINCE>
-          <ZIP>94501</ZIP>
-          <POS />
-          <COUNTRY>VN</COUNTRY>
-        </N4>
-      </ST>
-      <N9HDR QUAL="90">26.23</N9HDR>
-      <N9HDR QUAL="91">10.00</N9HDR>
-      <N9HDR QUAL="92">1.13</N9HDR>
-      <N9HDR QUAL="94">0.00</N9HDR>
-      <G62 TYPE="SHIP">20160112</G62>
-      <W66>
-        <SCAC>0000</SCAC>
-      </W66>
-    </HEADER>
-    <DETAIL>
-      <W01 LX="1" UOM="CT">
-        <N9DET QUAL="PODLNBR" />
-        <N9DET QUAL="SP">15.10</N9DET>
-        <ITEM>10628</ITEM>
-        <IKEY>85</IKEY>
-        <PACK>2</PACK>
-        <QTY>1</QTY>
-        <UPC>630989806526280</UPC>
-        <SKU />
-        <EAN13 />
-        <EAN14 />
-        <COLOR />
-        <SIZE />
-        <DESC />
-      </W01>
-    </DETAIL>
-    <TOTAL TITEMS="1" TQTY="1" TGWT="" TGCB="26.23" />
-  </ORDER>
-  <OWTOTAL TORDERS="1" />
-</OW>
+      <?xml version="1.0" encoding="utf-8"?>
+      <OW ISA="16042502016" SENTDATE="20160112" SENTTIME="1552" RXQ="ZZ" RX="16072913493sda0717" TXQ="ZZ" TX="1607291123349124350717" MODE="103231">
+        <ORDER EDI753="N" SEQ="00001" IMPORTS="Y" PRIORITY="N" RLABEL="N" TYPE="DTCS" SOURCE="100104">
+          <HEADER>
+            <BASICINFO>
+              <FREIGHT_TERMS CODE="CC" />
+              <PO TYPE="" DATE="20160112" />
+              <SONUMBER>1521</SONUMBER>
+            </BASICINFO>
+            <BT>
+              <N1 ACCOUNT="1001">Thang Le</N1>
+              <N3>
+                <ADDR1>542 Pacific Ave</ADDR1>
+                <ADDR2></ADDR2>
+              </N3>
+              <N4>
+                <CITY>Alameda</CITY>
+                <STATE_PROVINCE>CA</STATE_PROVINCE>
+                <ZIP>94501</ZIP>
+                <POS />
+                <COUNTRY>VN</COUNTRY>
+              </N4>
+            </BT>
+            <ST>
+              <N1 ACCOUNT="1001">Thang Le</N1>
+              <N3>
+                <ADDR1>542 Pacific Ave</ADDR1>
+                <ADDR2></ADDR2>
+              </N3>
+              <N4>
+                <CITY>Da Nang</CITY>
+                <STATE_PROVINCE>DN</STATE_PROVINCE>
+                <ZIP>94501</ZIP>
+                <POS />
+                <COUNTRY>VN</COUNTRY>
+              </N4>
+            </ST>
+            <N9HDR QUAL="90">26.23</N9HDR>
+            <N9HDR QUAL="91">10.00</N9HDR>
+            <N9HDR QUAL="92">1.13</N9HDR>
+            <N9HDR QUAL="94">0.00</N9HDR>
+            <G62 TYPE="SHIP">20160112</G62>
+            <W66>
+              <SCAC>0000</SCAC>
+            </W66>
+          </HEADER>
+          <DETAIL>
+            <W01 LX="1" UOM="CT">
+              <N9DET QUAL="PODLNBR" />
+              <N9DET QUAL="SP">15.10</N9DET>
+              <ITEM>10628</ITEM>
+              <IKEY>85</IKEY>
+              <PACK>2</PACK>
+              <QTY>1</QTY>
+              <UPC>630989806526280</UPC>
+              <SKU />
+              <EAN13 />
+              <EAN14 />
+              <COLOR />
+              <SIZE />
+              <DESC />
+            </W01>
+          </DETAIL>
+          <TOTAL TITEMS="1" TQTY="1" TGWT="" TGCB="26.23" />
+        </ORDER>
+        <OWTOTAL TORDERS="1" />
+      </OW>
     </textarea>
     <div id="xml"></div>
 </body>
-<script type="text/javascript" src="../src/xmldisplay.js"></script>
-<script>
-    loadXMLString('xml', document.getElementById("code").value, {
-        inline: true,
-
-        // this is default setting
-        useShortTag: false,
-        indentSpace: 4,
-        removeComment: true,
-        nodeLowerCase: false,
-        nodeUpperCase: false
-    });
-</script>
+<!-- inject:js -->
+<!-- endinject -->
 </html>
