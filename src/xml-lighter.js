@@ -1,14 +1,8 @@
 (function (global, factory) {
-  const xmlFormater = factory();
+  const xmlLighter = factory();
 
-  function renderXmlDOM(holderElementId, xmlDom, options) {
-    options = options || {};
-
-    const formatter = xmlFormater(options);
-
-    const xmlHolderElement = document.getElementById(holderElementId);
-
-    if (xmlDom || xmlHolderElement) {
+  function renderXmlDOM(xmlHolderElement, xmlString, options) {
+    if (xmlHolderElement) {
       function clear(element) {
         while (element && element.firstChild) {
           element.removeChild(element.firstChild);
@@ -17,29 +11,21 @@
       // If in block of parent has content like `xml` or other... clear all them
       clear(xmlHolderElement);
 
-      const container = formatter.render(xmlDom.documentElement);
+      const lighter = xmlLighter(options);
+
+      const xmlDom = lighter.convertToXmlDOM(xmlString);
+
+      const container = lighter.render(xmlDom.documentElement);
 
       xmlHolderElement.appendChild(container);
     }
   }
 
-  function convertToXmlDOM(xmlString) {
-    const formatter = xmlFormater();
-
-    return formatter.convertToXmlDOM(xmlString);
-  }
-
   // exports
   if (typeof define === 'function' && define.amd) { // AMD
-    define(['renderXmlDOM', 'convertToXmlDOM'], function () {
-      return {
-        renderXmlDOM,
-        convertToXmlDOM
-      };
-    });
+    define(['xmlLighter'], renderXmlDOM);
   } else { // for call on browser
-    global.renderXmlDOM = renderXmlDOM;
-    global.convertToXmlDOM = convertToXmlDOM;
+    global.xmlLighter = renderXmlDOM;
   }
 }(window, function () {
   'use strict';
@@ -77,7 +63,7 @@
     //classLineNumber         : 'line-number'
   };
 
-  const xmlFormater = function (userSettings = {}) {
+  const xmlLighter = function (userSettings = {}) {
     const defaultSettings = {
       containerTag: 'div',
       containerPosition: 'relative', // css position attributes liek that: "relative", "static", "fixed" or "absolute"
@@ -438,5 +424,5 @@
     };
   };
 
-  return xmlFormater;
+  return xmlLighter;
 }));

@@ -5,9 +5,8 @@ const rename = require('gulp-rename');
 const cleanCSS = require('gulp-clean-css');
 const inject = require('gulp-inject');
 const del = require('del');
-const es = require('event-stream');
 const injectSeries = require('stream-series');
-const through2 = require('through2');
+const browserSync = require('browser-sync').create();
 
 function clear() {
   return del(['dist/**']);
@@ -28,8 +27,8 @@ function streamCssTask() {
     .pipe(dest('dist/'));
 }
 
-function streamJsExampleTask() {
-  return src('example/*.js')
+function streamJsTestTask() {
+  return src('test/*.js')
     .pipe(babel())
     .pipe(uglify())
     .pipe(rename({ extname: '.min.js' }))
@@ -37,9 +36,9 @@ function streamJsExampleTask() {
 }
 
 function injectTask() {
-  return src('example/*.html')
+  return src('test/*.html')
     .pipe(inject(
-      injectSeries(streamJsTask(), streamCssTask(), streamJsExampleTask()),
+      injectSeries(streamJsTask(), streamCssTask(), streamJsTestTask()),
       {
         relative: true,
         transform: function (filePath, file, index, length, targetFile) {
@@ -58,13 +57,19 @@ function injectTask() {
     .pipe(dest('dist/'));
 }
 
-function watcher() {
-  watch('themes/*.css', series(clear, streamCssTask));
-
-  watch('src/*.js', series(clear, streamJsTask));
+function dev() {
+  browserSync.init({
+    server: {
+      baseDir: 'dist',
+      directory: true,
+    },
+    serveStatic: [{ route: 'dist', dir: './dist' }],
+  });
+  watch('themes/*.css', series(clear, injectTask)).on('change', browserSync.reload);
+  watch('test/*.*', series(clear, injectTask)).on('change', browserSync.reload);
+  watch('src/*.js', series(clear, injectTask)).on('change', browserSync.reload);
 }
 
-exports.clear = clear;
-exports.watch = watcher;
-exports.inject =  series(clear, injectTask);
+exports.dev = dev;
+exports.test =  series(clear, injectTask);
 exports.default = series(clear, parallel(streamCssTask, streamJsTask));

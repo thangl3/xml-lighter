@@ -1,7 +1,8 @@
 (function () {
-  const xml = convertToXmlDOM(document.getElementById("code").value);
+  const holderElm = document.getElementById('xml');
+  const xmlDom = convertToXmlDOM(document.getElementById("code").value);
 
-  renderXmlDOM('xml', xml, {
+  xmlLighter(holderElm, xmlDom, {
     inline: true,
 
     // this is default setting
