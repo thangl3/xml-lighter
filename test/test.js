@@ -1,15 +1,24 @@
 (function () {
   const holderElm = document.getElementById('xml');
-  const xmlDom = convertToXmlDOM(document.getElementById("code").value);
+  //const xmlString = document.getElementById("code").value
 
-  xmlLighter(holderElm, xmlDom, {
-    inline: true,
+  const xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      const xmlString = xhr.responseXML;
 
-    // this is default setting
-    useShortTag: false,
-    indentSpace: 4,
-    removeComment: true,
-    nodeLowerCase: false,
-    nodeUpperCase: false
-  });
+      xmlLighter(holderElm, xmlString, {
+        inline: true,
+
+        // this is default setting
+        useShortTag: false,
+        indentSpace: 4,
+        removeComment: true,
+        nodeLowerCase: false,
+        nodeUpperCase: false
+      });
+    }
+  };
+  xhr.open('GET', '/dist/book.xml');
+  xhr.send();
 }());

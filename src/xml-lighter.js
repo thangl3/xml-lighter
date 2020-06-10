@@ -13,11 +13,12 @@
 
       const lighter = xmlLighter(options);
 
-      const xmlDom = lighter.convertToXmlDOM(xmlString);
+      let xmlDom = xmlString;
+      if (typeof xmlDom === 'string') {
+        xmlDom = lighter.convertToXmlDOM(xmlString);
+      }
 
-      const container = lighter.render(xmlDom.documentElement);
-
-      xmlHolderElement.appendChild(container);
+      xmlHolderElement.appendChild(lighter.render(xmlDom.documentElement));
     }
   }
 
@@ -47,7 +48,8 @@
     classBracket: 'bracket',
     classBracketOpen: 'bracket-open',
     classBracketClose: 'bracket-close',
-    classBracketShortClose: 'bracket-short-close',
+    classBracketCloseWithSlash: 'bracket-close-slash',
+    classBracketOpenWithSlash: 'bracket-open-slash',
     classEquals: 'equals',
     classAttributeName: 'node-attribute-name',
     classAttributeValue: 'node-attribute-value',
@@ -264,16 +266,10 @@
           // Create a short tag node like that:
           // <Hello />
           // Hello attribute="123abc" />
-          containerLessElement.appendChild(createTextNode(
-            '<',
-            [
-              constants.classBracket,
-              constants.classBracketOpen
-            ]
-          ));
+          containerLessElement.appendChild(createTextNode('<', [constants.classBracket, constants.classBracketOpen]));
           containerLessElement.appendChild(createTextNode(_stringify(xmlRootNode.nodeName), constants.classNodeName));
           generatorAttributesNode(containerLessElement, xmlRootNode.attributes);
-          containerLessElement.appendChild(createTextNode(' />', [constants.classBracket, constants.classBracketShortClose]));
+          containerLessElement.appendChild(createTextNode(' />', [constants.classBracket, constants.classBracketCloseWithSlash]));
 
           addClass(containerLessElement, constants.classNodeUncollapse);
 
@@ -296,14 +292,13 @@
             // create a node like that:
             // <Hello attribute="123"></Hello>
             // <Hello></Hello>
-            containerLessElement.appendChild(
-              createTextNode('<', [constants.classBracket, constants.classBracketOpen])
-            );
+            containerLessElement.appendChild(createTextNode('<', [constants.classBracket, constants.classBracketOpen]));
             containerLessElement.appendChild(createTextNode(_stringify(xmlRootNode.nodeName), constants.classNodeName));
             generatorAttributesNode(containerLessElement, xmlRootNode.attributes);
-            containerLessElement.appendChild(createTextNode('></', [constants.classBracket, constants.classBracketClose]));
+            containerLessElement.appendChild(createTextNode('>', [constants.classBracket, constants.classBracketClose]));
+            containerLessElement.appendChild(createTextNode('</', [constants.classBracket, constants.classBracketOpenWithSlash]));
             containerLessElement.appendChild(createTextNode(_stringify(xmlRootNode.nodeName), constants.classNodeName));
-            containerLessElement.appendChild(createTextNode('>', constants.classBracket));
+            containerLessElement.appendChild(createTextNode('>', [constants.classBracket, constants.classBracketClose]));
 
             container.appendChild(containerLessElement);
 
@@ -335,7 +330,7 @@
           containerMoreElement.appendChild(createTextNode('<', [constants.classBracket, constants.classBracketOpen]));
           containerMoreElement.appendChild(createTextNode(_stringify(xmlRootNode.nodeName), constants.classNodeName));
           generatorAttributesNode(containerMoreElement, xmlRootNode.attributes);
-          containerMoreElement.appendChild(createTextNode('>', constants.classBracket));
+          containerMoreElement.appendChild(createTextNode('>', [constants.classBracket, constants.classBracketClose]));
 
           ///// Loop and continue render if in a node have many node else render only value
           const n = xmlRootNode.childNodes.length;
@@ -378,11 +373,9 @@
 
           // Create close tag node like that:
           // </Hello>
-          containerMoreElement.appendChild(
-            createTextNode('</', [constants.classBracket, constants.classBracketClose])
-          );
+          containerMoreElement.appendChild(createTextNode('</', [constants.classBracket, constants.classBracketOpenWithSlash]));
           containerMoreElement.appendChild(createTextNode(_stringify(xmlRootNode.nodeName), constants.classNodeName));
-          containerMoreElement.appendChild(createTextNode('>', constants.classBracket));
+          containerMoreElement.appendChild(createTextNode('>', [constants.classBracket, constants.classBracketClose]));
 
           container.appendChild(containerMoreElement);
           ///// End create
