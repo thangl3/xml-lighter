@@ -23,11 +23,12 @@
   }
 
   // exports
-  if (typeof define === 'function' && define.amd) { // AMD
-    define(['xmlLighter'], renderXmlDOM);
-  } else { // for call on browser
-    global.xmlLighter = renderXmlDOM;
-  }
+  // if (typeof define === 'function' && define.amd) { // AMD
+  //   define('xmlLighter', renderXmlDOM);
+  // } else { // for call on browser
+  //   global.xmlLighter = renderXmlDOM;
+  // }
+  global.xmlLighter = renderXmlDOM;
 }(window, function () {
   'use strict';
 
@@ -65,7 +66,7 @@
     //classLineNumber         : 'line-number'
   };
 
-  const xmlLighter = function (userSettings = {}) {
+  const xmlLighter = (userSettings = {}) => {
     const defaultSettings = {
       containerTag: 'div',
       containerPosition: 'relative', // css position attributes liek that: "relative", "static", "fixed" or "absolute"
@@ -100,7 +101,7 @@
       return text;
     }
 
-    const convertToXmlDOM = function (xmlString) {
+    const convertToXmlDOM = (xmlString) => {
       let xmlDom = null;
       xmlString = _trim(xmlString);
 
@@ -113,7 +114,7 @@
       return xmlDom;
     };
 
-    const render = function (xmlNode) {
+    const render = (xmlNode) => {
       // This `id` indentify where the child nodes is?
       // Purpose `select` for toggle...
       let idRender = 1;
