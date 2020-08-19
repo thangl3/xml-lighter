@@ -9,7 +9,7 @@
 
 .xml-display .node-name {
     font-weight: 900;
-    color: #800080d6; 
+    color: #800080d6;
 }
 
 .xml-display .node-value {
@@ -50,6 +50,11 @@
 
 .xml-display .switcher::before {
     content: "▼";
+}
+
+.xml-display .switcher.collapsed {
+    margin: 0;
+    left: -15px;
 }
 
 .xml-display .switcher.collapsed::before {

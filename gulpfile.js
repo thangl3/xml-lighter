@@ -89,9 +89,9 @@ function dev() {
     reloadDelay: 500,
   });
 
+  watch('src/*.js', series(clear, injectTask));
   watch('test/*.{html,js}', series(clear, injectTask)).on('change', browserSync.reload);
   watch('themes/*.{css,scss}', series(clear, injectTask));
-  watch('src/*.js', series(clear, injectTask));
 }
 
 function clearBuild() {

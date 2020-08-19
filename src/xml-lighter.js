@@ -55,7 +55,7 @@
     classAttributeName: 'node-attribute-name',
     classAttributeValue: 'node-attribute-value',
 
-    classDivContainer: 'node',
+    classDefault: 'node',
     classNodeParent: 'node-parent',
     classNodeCollapsed: 'node-collapsed',
     classNodeUncollapse: 'node-uncollapse',
@@ -63,13 +63,14 @@
     classSwitcherCollapsed: 'collapsed',
     classAddLineCode: 'line-code',
     classOneLineCode: 'one-line-code',
-    //classLineNumber         : 'line-number'
+    //classLineNumber: 'line-number',
+
+    tagDefault: 'div',
+    stylePositionDefault: 'relative',  // css position attributes like that: "relative", "static", "fixed" or "absolute"
   };
 
   const xmlLighter = (userSettings = {}) => {
     const defaultSettings = {
-      containerTag: 'div',
-      containerPosition: 'relative', // css position attributes liek that: "relative", "static", "fixed" or "absolute"
       indentSpace: 4,
       pxOfOnceSpace: 6, // each once space (tab) equals 7px
       removeComment: true,
@@ -78,6 +79,7 @@
       inline: true,
       useShortTag: true,
       //lineNumber: false
+      prefixIdRender: 'xl-',
     };
 
     // Override default settings
@@ -94,13 +96,13 @@
 
       if (defaultSettings.nodeUpperCase) {
         return text.toUpperCase();
-      } else if (defaultSettings.nodeLowerCase) {
+      }
+      if (defaultSettings.nodeLowerCase) {
         return text.toLowerCase();
       }
 
       return text;
     }
-
     const convertToXmlDOM = (xmlString) => {
       let xmlDom = null;
       xmlString = _trim(xmlString);
@@ -120,6 +122,17 @@
       let idRender = 1;
       let startWithIndentSpace = 0;
 
+      function createIdRender() {
+        if (arguments.length > 0) {
+          return defaultSettings.prefixIdRender + [].slice.call(arguments).join('');
+        }
+
+        const id = defaultSettings.prefixIdRender + idRender;
+        idRender++;
+
+        return id;
+      }
+
       function setVisibility(element, visible) {
         element.style.display = visible ? 'block' : 'none';
       }
@@ -133,26 +146,26 @@
       }
 
       function toggleElement(element) {
-        let elementToShow, elementToHide;
+        let elementNeedShow, elementNeedHide;
 
         // get action of user's click
         let action = element.dataset.action;
-        let id = element.dataset.id;
+        let elmId = element.dataset.id;
 
         if (action === constants.switchMoreAction) {
-          elementToHide = document.getElementById(constants.switchMorePrefix + id);
-          elementToShow = document.getElementById(constants.switchLessPrefix + id);
+          elementNeedShow = document.getElementById(createIdRender(constants.switchLessPrefix, elmId));
+          elementNeedHide = document.getElementById(createIdRender(constants.switchMorePrefix, elmId));
         } else if (action === constants.switchLessAction) {
-          elementToShow = document.getElementById(constants.switchMorePrefix + id);
-          elementToHide = document.getElementById(constants.switchLessPrefix + id);
+          elementNeedShow = document.getElementById(createIdRender(constants.switchMorePrefix, elmId));
+          elementNeedHide = document.getElementById(createIdRender(constants.switchLessPrefix, elmId));
         }
 
-        setVisibility(elementToHide.parentNode, false);
-        setVisibility(elementToShow.parentNode, true);
+        setVisibility(elementNeedShow.parentNode, true);
+        setVisibility(elementNeedHide.parentNode, false);
       }
 
       function createElement(tagName, cssClass, position, isIndent) {
-        tagName = tagName || defaultSettings.containerTag;
+        tagName = tagName || constants.tagDefault;
 
         const containerElement = document.createElement(tagName);
 
@@ -163,14 +176,16 @@
           for (i; i < n; ++i) {
             containerElement.classList.add(cssClass[i]);
           }
-        } else {
-          containerElement.className = cssClass || constants.classDivContainer;
+        } else if (cssClass !== false) { // if null, undefined, ... will use default value
+          containerElement.className = cssClass || constants.classDefault;
         }
 
-        if (position != false) {
-          containerElement.style.position = position || defaultSettings.containerPosition;
+        // if null, undefined, ... will use default value
+        if (position !== false) {
+          containerElement.style.position = position || constants.stylePositionDefault;
         }
 
+        // if null, undefined, ... will use default value is 0
         if (isIndent !== false) {
           containerElement.style.marginLeft = computedNestingIndent(startWithIndentSpace);
         }
@@ -183,7 +198,7 @@
       }
 
       function createTextNode(text, cssClass, tag) {
-        const childNode = createElement(tag || 'span', false, false, false);
+        const childNode = createElement(tag || 'span', null, false, false);
 
         if (Array.isArray(cssClass)) {
           const n = cssClass.length;
@@ -235,14 +250,15 @@
           switcherElement = createTextNode('', constants.classSwitcher);
         }
 
-        switcherElement.dataset.action = action;
         switcherElement.dataset.id = idRender;
+        switcherElement.dataset.action = action;
+        switcherElement.dataset.actionId = createIdRender(prefix, idRender);
 
         switcherElement.onclick = function () {
           toggleElement(this);
         }
 
-        switcherElement.id = prefix + idRender;
+        switcherElement.id = createIdRender(prefix, idRender);
 
         return switcherElement;
       }
@@ -285,7 +301,7 @@
           ///// create shadow of node element
           // shadow display when user toggle (visible less `xml`) of a node
           if (canCreateShadowSwitcher) {
-            const containerLessElement = createElement(null, [constants.classDivContainer, constants.classNodeCollapsed]);
+            const containerLessElement = createElement(null, [constants.classDefault, constants.classNodeCollapsed]);
 
             // This will display when user click display `less`
             containerLessElement.appendChild(createSwitcherNode(true, idRender));
@@ -386,22 +402,22 @@
       }
 
       // Pure function render xml to browser
-      const containerNodeElement = createElement('div', false, false, false);
+      const containerNodeElement = createElement('div', constants.classDefault, false, false);
       containerNodeElement.className = constants.classContainer;
 
       generator(containerNodeElement, xmlNode, 0);
 
-      //if (!!(!defaultSettings.lineNumber)) {
+      //if (!defaultSettings.lineNumber) {
       return containerNodeElement;
       //}
 
-      // const containerElement = createElement('div',[constants.classContainer, constants.classInline], false, false);
+      // const containerElement = createElement('div',[constants.classContainer], false, false);
 
       // const totalLineCode = containerNodeElement.querySelectorAll('.' + constants.classOneLineCode).length || 0;
       // const lineNumberContainer = createElement('div', constants.classLineNumber, false, false);
 
       // for (let i = 1; i <= totalLineCode; i++) {
-      //     lineNumberContainer.appendChild(createElement('span', false, false, false));
+      //   lineNumberContainer.appendChild(createElement('span', null, false, false));
       // }
 
       // containerElement.appendChild(lineNumberContainer);

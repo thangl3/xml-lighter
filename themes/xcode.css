@@ -9,7 +9,7 @@
 
 .xml-display .node-name {
     font-weight: 600;
-    color: #C43A75; 
+    color: #C43A75;
 }
 
 .xml-display .node-value {
@@ -62,7 +62,6 @@
     color: #C43A75;
     cursor:pointer;
     vertical-align:middle;
-
 }
 
 .xml-display .node:hover > .switcher {
@@ -75,6 +74,11 @@
 
 .xml-display .switcher::before {
     content: "▼";
+}
+
+.xml-display .switcher.collapsed {
+    margin: 0;
+    left: -15px;
 }
 
 .xml-display .switcher.collapsed::before {

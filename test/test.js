@@ -15,7 +15,7 @@
         indentSpace: 4,
         removeComment: true,
         nodeLowerCase: false,
-        nodeUpperCase: false
+        nodeUpperCase: false,
       });
     }
   };

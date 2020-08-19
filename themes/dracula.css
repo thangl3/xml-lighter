@@ -51,6 +51,11 @@
     content: "▼";
 }
 
+.xml-display .switcher.collapsed {
+    margin: 0;
+    left: -15px;
+}
+
 .xml-display .switcher.collapsed::before {
     content: "▶";
     font-size: 12px;
@@ -86,7 +91,7 @@
     border-left-style: dotted;
 }
 
-/*.xml-display .line-number {
+/* .xml-display .line-number {
     background-color: #282923;
     width: 1.7rem;
     padding: 0.15rem 0.5em 0.15rem 0;
@@ -115,4 +120,4 @@
     width: 1.5rem;
     text-align: right;
     color: #888
-}*/
+} */

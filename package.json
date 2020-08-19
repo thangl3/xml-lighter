@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/thangl3/xml-lighter#readme",
   "devDependencies": {
-    "@babel/core": "^7.11.0",
+    "@babel/core": "^7.11.1",
     "@babel/preset-env": "^7.11.0",
     "benchmark": "^2.1.4",
     "browser-sync": "^2.26.12",
